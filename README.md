@@ -1,3 +1,7 @@
+## Live website
+
+[Open the CARBON μ interactive website](https://carbon-mu-vercel.vercel.app/)
+
 # CARBON μ
 
 A ready-to-deploy Next.js and TypeScript educational website exploring subsurface carbon storage. Built with React Three Fiber, Three.js, Drei and Lucide. No API keys, database, paid services, or scientific compute are needed to run this prototype.
