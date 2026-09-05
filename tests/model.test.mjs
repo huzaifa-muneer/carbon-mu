@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {predict,initialDetectors,optimize} from '../lib/model.mjs';
+const base={depth:700,area:3,exposure:30,sensors:{seismic:true,muon:true,well:true,sar:false},detectors:initialDetectors};
+test('deeper detectors have lower illustrative count rates',()=>assert.ok(predict({...base,depth:900}).rate<predict({...base,depth:300}).rate));
+test('larger area increases count rate proportionally',()=>assert.equal(predict({...base,area:6}).rate,2*predict(base).rate));
+test('longer exposure increases counts and reduces demonstration uncertainty',()=>{const short=predict({...base,exposure:1}),long=predict({...base,exposure:180});assert.ok(long.events>short.events);assert.ok(long.uncertainty<short.uncertainty)});
+test('muon evidence reduces uncertainty and placement improves the demo score',()=>{assert.ok(predict(base).uncertainty<predict({...base,sensors:{...base.sensors,muon:false}}).uncertainty);assert.ok(predict({...base,detectors:optimize()}).uncertainty<predict(base).uncertainty)});
+test('all inputs disabled returns the stated prior',()=>{const r=predict({...base,sensors:{seismic:false,muon:false,well:false,sar:false}});assert.equal(r.uncertainty,70);assert.equal(r.information,0)});
+test('supported parameter extremes produce finite results',()=>{for(const depth of [300,900])for(const area of [1,10])for(const exposure of [1,180]){const r=predict({...base,depth,area,exposure});for(const n of Object.values(r))assert.ok(Number.isFinite(n));assert.ok(r.uncertainty>0&&r.uncertainty<=70)}});
